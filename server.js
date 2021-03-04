@@ -1,6 +1,15 @@
 const express = require('express');
+const Article = require('./models/article');
+const mongoose = require('mongoose');
 const { post } = require('./routes/articles');
 const app = express();
+
+//database
+mongoose.connect('mongodb://localhost/blog', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+});
 
 //router
 const articleRouter = require('./routes/articles');
@@ -8,18 +17,17 @@ const articleRouter = require('./routes/articles');
 //view engine
 app.set('view engine', 'ejs');
 
-app.use('/articles', articleRouter);
+//middleware
+app.use(express.urlencoded({ extended: false }));
 
 //response
-app.get('/', (req, res) => {
-  const articles = [
-    {
-      title: 'this is a blog post',
-      createAt: Date.now(),
-      description: 'this is description for the article',
-    },
-  ];
-  res.render('index', { articles: articles });
+app.get('/', async (req, res) => {
+  const articles = await Article.find().sort({
+    createdAt: 'desc',
+  });
+  res.render('articles/index', { articles: articles });
 });
+
+app.use('/articles', articleRouter);
 
 app.listen(5000);
