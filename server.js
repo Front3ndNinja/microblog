@@ -2,6 +2,7 @@ const express = require('express');
 const Article = require('./models/article');
 const mongoose = require('mongoose');
 const { post } = require('./routes/articles');
+const methodOverride = require('method-override');
 const app = express();
 
 //database
@@ -19,6 +20,7 @@ app.set('view engine', 'ejs');
 
 //middleware
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 
 //response
 app.get('/', async (req, res) => {
